@@ -1,7 +1,7 @@
 FROM library/tomcat:9-jre11-openjdk-bullseye
 
 ENV ARCH=amd64 \
-    GUAC_VER=1.4.0 \
+    GUAC_VER=1.5.0 \
     GUACAMOLE_HOME=/app/guacamole \
     PG_MAJOR=9.6 \
     PGDATA=/config/postgres \
@@ -70,7 +70,7 @@ RUN set -x \
   && cp -R guacamole-auth-jdbc-${GUAC_VER}/postgresql/schema ${GUACAMOLE_HOME}/ \
   && rm -rf guacamole-auth-jdbc-${GUAC_VER} guacamole-auth-jdbc-${GUAC_VER}.tar.gz
 
-
+# add auth-sso to available extensions folder structur differs from other extensions
 RUN set -xe \
   && echo "https://dlcdn.apache.org/guacamole/${GUAC_VER}/binary/guacamole-auth-sso-${GUAC_VER}.tar.gz" \
   && curl -SLO "https://dlcdn.apache.org/guacamole/${GUAC_VER}/binary/guacamole-auth-sso-${GUAC_VER}.tar.gz" \
@@ -80,10 +80,17 @@ RUN set -xe \
   && cp guacamole-auth-sso-${GUAC_VER}/saml/guacamole-auth-sso-saml-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
   && rm -rf guacamole-auth-sso-${GUAC_VER} guacamole-auth-sso-${GUAC_VER}.tar.gz
 
+# add vault to available extensions folder structur differs from other extensions
+RUN set -xe \
+  && echo "https://dlcdn.apache.org/guacamole/${GUAC_VER}/binary/guacamole-vault-${GUAC_VER}.tar.gz" \
+  && curl -SLO "https://dlcdn.apache.org/guacamole/${GUAC_VER}/binary/guacamole-vault-${GUAC_VER}.tar.gz" \
+  && tar -xzf guacamole-vault-${GUAC_VER}.tar.gz \
+  && cp guacamole-vault-${GUAC_VER}/ksm/guacamole-vault-ksm-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
+  && rm -rf guacamole-vault-${GUAC_VER} guacamole-vault-${GUAC_VER}.tar.gz
 
 # Add optional extensions
 RUN set -xe \
-  && for i in auth-duo auth-header auth-json auth-ldap auth-quickconnect auth-totp; do \
+  && for i in auth-duo auth-header auth-json auth-ldap auth-quickconnect auth-totp history-recording-storage; do \
     echo "https://dlcdn.apache.org/guacamole/${GUAC_VER}/binary/guacamole-${i}-${GUAC_VER}.tar.gz" \
     && curl -SLO "https://dlcdn.apache.org/guacamole/${GUAC_VER}/binary/guacamole-${i}-${GUAC_VER}.tar.gz" \
     && tar -xzf guacamole-${i}-${GUAC_VER}.tar.gz \

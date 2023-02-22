@@ -68,6 +68,8 @@ Currently the available extensions are:
 * auth-sso-openid - [OpenID Authentication](https://guacamole.apache.org/doc/gug/openid-auth.html)
 * auth-sso-saml - [SAML Authentication](https://guacamole.apache.org/doc/gug/saml-auth.html)
 * auth-totp - [TOTP two-factor authentication](https://guacamole.apache.org/doc/gug/totp-auth.html)
+* history-recording-storage - [Session Recording Playback](https://guacamole.apache.org/doc/gug/recording-playback.html#)
+* vault - [Retrieving secrets from a vault](https://guacamole.apache.org/doc/gug/vault.html)
 
 You should only enable the extensions you require, if an extensions is not configured correctly in the `guacamole.properties` file it may prevent the system from loading. See the [official documentation](https://guacamole.apache.org/doc/gug/) for more details.
 
