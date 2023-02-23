@@ -9,8 +9,9 @@ ENV ARCH=amd64 \
     POSTGRES_DB=guacamole_db
 
 # Add Postgres Repository
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main" >> /etc/apt/sources.list.d/pgdg.list && \
-    wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | apt-key add -
+RUN apt-get update && apt-get install -y curl ca-certificates gnupg
+RUN curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg > /dev/null
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
 
 # Install dependencies
 RUN apt-get update \
