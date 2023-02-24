@@ -16,7 +16,7 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" >> /et
 # Install dependencies
 RUN apt-get update \
  && apt-get install -y \
-    libcairo2-dev libjpeg62-turbo-dev libpng-dev \
+    libcairo2-dev libjpeg62-turbo-dev libpng-dev libavformat-dev libwebsockets-dev\
     libossp-uuid-dev libavcodec-dev libavutil-dev \
     libswscale-dev freerdp2-dev libfreerdp-client2-2 libpango1.0-dev \
     libssh2-1-dev libtelnet-dev libvncserver-dev \
