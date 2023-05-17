@@ -1,7 +1,7 @@
 FROM library/tomcat:9-jre11-openjdk-bullseye
 
 ENV ARCH=amd64 \
-    GUAC_VER=1.5.0 \
+    GUAC_VER=1.5.1 \
     GUACAMOLE_HOME=/app/guacamole \
     PG_MAJOR=9.6 \
     PGDATA=/config/postgres \
