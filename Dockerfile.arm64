@@ -1,7 +1,6 @@
 FROM library/tomcat:9-jre11-openjdk-bullseye
 
-ENV ARCH=amd64 \
-    GUAC_VER=1.5.2 \
+ENV GUAC_VER=1.5.2 \
     GUACAMOLE_HOME=/app/guacamole \
     PG_MAJOR=9.6 \
     PGDATA=/config/postgres \
@@ -26,10 +25,10 @@ RUN apt-get update \
 
 
 # Apply the s6-overlay
-ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.3/s6-overlay-${ARCH}.tar.gz /tmp
-RUN tar -xzf /tmp/s6-overlay-${ARCH}.tar.gz -C / \
- && tar -xzf /tmp/s6-overlay-${ARCH}.tar.gz -C /usr ./bin \
- && rm -rf /tmp/s6-overlay-${ARCH}.tar.gz
+ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.3/s6-overlay-armhf.tar.gz /tmp
+RUN tar -xzf /tmp/s6-overlay-armhf.tar.gz -C / \
+ && tar -xzf /tmp/s6-overlay-armhf.tar.gz -C /usr ./bin \
+ && rm -rf /tmp/s6-overlay-armhf.tar.gz
 
 RUN mkdir -p ${GUACAMOLE_HOME} \
     ${GUACAMOLE_HOME}/lib \
@@ -38,13 +37,13 @@ RUN mkdir -p ${GUACAMOLE_HOME} \
 WORKDIR ${GUACAMOLE_HOME}
 
 # Link FreeRDP to where guac expects it to be
-RUN [ "$ARCH" = "armhf" ] && ln -s /usr/local/lib/freerdp /usr/lib/arm-linux-gnueabihf/freerdp || exit 0
-RUN [ "$ARCH" = "amd64" ] && ln -s /usr/local/lib/freerdp /usr/lib/x86_64-linux-gnu/freerdp || exit 0
+RUN ln -s /usr/local/lib/freerdp /usr/lib/arm-linux-gnueabihf/freerdp || exit 0
 
 RUN echo $PATH
 
 # Install guacamole-server
-RUN curl -SLO "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/${GUAC_VER}/source/guacamole-server-${GUAC_VER}.tar.gz" \
+
+RUN curl -SLO "https://archive.apache.org/dist/guacamole/${GUAC_VER}/source/guacamole-server-${GUAC_VER}.tar.gz" \
  && tar -xzf guacamole-server-${GUAC_VER}.tar.gz \
  && cd guacamole-server-${GUAC_VER} \
  && ./configure --enable-allow-freerdp-snapshots \
@@ -60,9 +59,9 @@ RUN mkdir ${GUACAMOLE_HOME}/extensions-available
 # Install guacamole-client and postgres auth adapter
 RUN set -x \
   && rm -rf ${CATALINA_HOME}/webapps/ROOT \
-  && curl -SLo ${CATALINA_HOME}/webapps/ROOT.war "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/${GUAC_VER}/binary/guacamole-${GUAC_VER}.war" \
+  && curl -SLo ${CATALINA_HOME}/webapps/ROOT.war "https://archive.apache.org/dist/guacamole/${GUAC_VER}/binary/guacamole-${GUAC_VER}.war" \
   && curl -SLo ${GUACAMOLE_HOME}/lib/postgresql-42.1.4.jar "https://jdbc.postgresql.org/download/postgresql-42.2.24.jar" \
-  && curl -SLO "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/${GUAC_VER}/binary/guacamole-auth-jdbc-${GUAC_VER}.tar.gz" \
+  && curl -SLO "https://archive.apache.org/dist/guacamole/${GUAC_VER}/binary/guacamole-auth-jdbc-${GUAC_VER}.tar.gz" \
   && tar -xzf guacamole-auth-jdbc-${GUAC_VER}.tar.gz \
   && cp guacamole-auth-jdbc-${GUAC_VER}/postgresql/guacamole-auth-jdbc-postgresql-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions/ \
   && cp guacamole-auth-jdbc-${GUAC_VER}/postgresql/guacamole-auth-jdbc-postgresql-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
@@ -73,8 +72,8 @@ RUN set -x \
 
 # add auth-sso to available extensions folder structur differs from other extensions
 RUN set -xe \
-  && echo "https://dlcdn.apache.org/guacamole/${GUAC_VER}/binary/guacamole-auth-sso-${GUAC_VER}.tar.gz" \
-  && curl -SLO "https://dlcdn.apache.org/guacamole/${GUAC_VER}/binary/guacamole-auth-sso-${GUAC_VER}.tar.gz" \
+  && echo "https://archive.apache.org/dist/guacamole/${GUAC_VER}/binary/guacamole-auth-sso-${GUAC_VER}.tar.gz" \
+  && curl -SLO "https://archive.apache.org/dist/guacamole/${GUAC_VER}/binary/guacamole-auth-sso-${GUAC_VER}.tar.gz" \
   && tar -xzf guacamole-auth-sso-${GUAC_VER}.tar.gz \
   && cp guacamole-auth-sso-${GUAC_VER}/cas/guacamole-auth-sso-cas-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
   && cp guacamole-auth-sso-${GUAC_VER}/openid/guacamole-auth-sso-openid-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
@@ -83,8 +82,8 @@ RUN set -xe \
 
 # add vault to available extensions folder structur differs from other extensions
 RUN set -xe \
-  && echo "https://dlcdn.apache.org/guacamole/${GUAC_VER}/binary/guacamole-vault-${GUAC_VER}.tar.gz" \
-  && curl -SLO "https://dlcdn.apache.org/guacamole/${GUAC_VER}/binary/guacamole-vault-${GUAC_VER}.tar.gz" \
+  && echo "https://archive.apache.org/dist/guacamole/${GUAC_VER}/binary/guacamole-vault-${GUAC_VER}.tar.gz" \
+  && curl -SLO "https://archive.apache.org/dist/guacamole/${GUAC_VER}/binary/guacamole-vault-${GUAC_VER}.tar.gz" \
   && tar -xzf guacamole-vault-${GUAC_VER}.tar.gz \
   && cp guacamole-vault-${GUAC_VER}/ksm/guacamole-vault-ksm-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
   && rm -rf guacamole-vault-${GUAC_VER} guacamole-vault-${GUAC_VER}.tar.gz
@@ -92,8 +91,8 @@ RUN set -xe \
 # Add optional extensions
 RUN set -xe \
   && for i in auth-duo auth-header auth-json auth-ldap auth-quickconnect auth-totp history-recording-storage; do \
-    echo "https://dlcdn.apache.org/guacamole/${GUAC_VER}/binary/guacamole-${i}-${GUAC_VER}.tar.gz" \
-    && curl -SLO "https://dlcdn.apache.org/guacamole/${GUAC_VER}/binary/guacamole-${i}-${GUAC_VER}.tar.gz" \
+    echo "https://archive.apache.org/dist/guacamole/${GUAC_VER}/binary/guacamole-${i}-${GUAC_VER}.tar.gz" \
+    && curl -SLO "https://archive.apache.org/dist/guacamole/${GUAC_VER}/binary/guacamole-${i}-${GUAC_VER}.tar.gz" \
     && tar -xzf guacamole-${i}-${GUAC_VER}.tar.gz \
     && cp guacamole-${i}-${GUAC_VER}/guacamole-${i}-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
     && rm -rf guacamole-${i}-${GUAC_VER} guacamole-${i}-${GUAC_VER}.tar.gz \
