@@ -1,7 +1,7 @@
 FROM library/tomcat:9-jre11-openjdk-bullseye
 
 ENV ARCH=amd64 \
-    GUAC_VER=1.5.3 \
+    GUAC_VER=1.5.4 \
     GUACAMOLE_HOME=/app/guacamole \
     PG_MAJOR=9.6 \
     PGDATA=/config/postgres \
@@ -47,6 +47,7 @@ RUN echo $PATH
 RUN curl -SLO "https://archive.apache.org/dist/guacamole/${GUAC_VER}/source/guacamole-server-${GUAC_VER}.tar.gz" \
  && tar -xzf guacamole-server-${GUAC_VER}.tar.gz \
  && cd guacamole-server-${GUAC_VER} \
+ && export LDFLAGS="-lrt" \
  && ./configure --enable-allow-freerdp-snapshots \
  && make -j$(getconf _NPROCESSORS_ONLN) \
  && make install \
