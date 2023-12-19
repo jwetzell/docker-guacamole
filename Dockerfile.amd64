@@ -4,6 +4,7 @@ ENV ARCH=amd64 \
     GUAC_VER=1.5.4 \
     GUACAMOLE_HOME=/app/guacamole \
     PG_MAJOR=9.6 \
+    LIBSSH2_VER=1.11.0 \
     PGDATA=/config/postgres \
     POSTGRES_USER=guacamole \
     POSTGRES_DB=guacamole_db
@@ -25,14 +26,13 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # Build & install libssh2
-ADD https://www.libssh2.org/download/libssh2-1.11.0.tar.gz /tmp
-RUN tar -xzvf /tmp/libssh2-1.11.0.tar.gz \
-  && cd libssh2-1.11.0 \
+ADD https://www.libssh2.org/download/libssh2-${LIBSSH2_VER}.tar.gz /tmp
+RUN tar -xzvf /tmp/libssh2-${LIBSSH2_VER}.tar.gz \
+  && cd libssh2-${LIBSSH2_VER} \
   && ./configure \
   && make \
   && make install \
-  && cd .. \
-  && rm -rf libssh2-1.11.0.tar.gz libssh2-1.11.0
+  && rm -rf /tmp/libssh2-${LIBSSH2_VER}*
 
 # Apply the s6-overlay
 ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.3/s6-overlay-amd64.tar.gz /tmp
