@@ -2,26 +2,21 @@ FROM library/tomcat:9-jre11-openjdk-bullseye
 
 ENV GUAC_VER=1.5.4 \
     GUACAMOLE_HOME=/app/guacamole \
-    PG_MAJOR=9.6 \
+    PG_VER=9.6.24 \
     LIBSSH2_VER=1.11.0 \
     PGDATA=/config/postgres \
     POSTGRES_USER=guacamole \
     POSTGRES_DB=guacamole_db
 
-# Add Postgres Repository
-RUN apt-get update && apt-get install -y curl ca-certificates gnupg
-RUN curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg > /dev/null
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
-
 # Install dependencies
 RUN apt-get update \
- && apt-get install -y \
+ && apt-get install -y curl ca-certificates gnupg \
     libcairo2-dev libjpeg62-turbo-dev libpng-dev libavformat-dev libwebsockets-dev\
     libossp-uuid-dev libavcodec-dev libavutil-dev \
     libswscale-dev freerdp2-dev libfreerdp-client2-2 libpango1.0-dev \
     libtelnet-dev libvncserver-dev \
     libpulse-dev libssl-dev libvorbis-dev libwebp-dev libwebsockets-dev \
-    ghostscript build-essential postgresql-${PG_MAJOR} \
+    ghostscript build-essential libreadline-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Build & install libssh2
@@ -32,6 +27,17 @@ RUN tar -xzvf /tmp/libssh2-${LIBSSH2_VER}.tar.gz \
   && make \
   && make install \
   && rm -rf /tmp/libssh2-${LIBSSH2_VER}*
+
+# Build & install postgresql
+ADD https://ftp.postgresql.org/pub/source/v${PG_VER}/postgresql-${PG_VER}.tar.gz /tmp
+RUN tar -xzvf /tmp/postgresql-${PG_VER}.tar.gz \
+  && cd postgresql-${PG_VER} \
+  && ./configure \
+  && make \
+  && make install \
+  && rm -rf /tmp/postgresql-${PG_VER}*
+
+RUN useradd postgres
   
 # Apply the s6-overlay
 ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.3/s6-overlay-armhf.tar.gz /tmp
@@ -47,8 +53,6 @@ WORKDIR ${GUACAMOLE_HOME}
 
 # Link FreeRDP to where guac expects it to be
 RUN ln -s /usr/local/lib/freerdp /usr/lib/arm-linux-gnueabihf/freerdp || exit 0
-
-RUN echo $PATH
 
 # Install guacamole-server
 
@@ -108,7 +112,7 @@ RUN set -xe \
     && rm -rf guacamole-${i}-${GUAC_VER} guacamole-${i}-${GUAC_VER}.tar.gz \
   ;done
 
-ENV PATH=/usr/lib/postgresql/${PG_MAJOR}/bin:$PATH
+ENV PATH="/usr/local/pgsql/bin:$PATH"
 ENV GUACAMOLE_HOME=/config/guacamole
 
 WORKDIR /config
