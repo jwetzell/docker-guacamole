@@ -19,11 +19,20 @@ RUN apt-get update \
     libcairo2-dev libjpeg62-turbo-dev libpng-dev libavformat-dev libwebsockets-dev\
     libossp-uuid-dev libavcodec-dev libavutil-dev \
     libswscale-dev freerdp2-dev libfreerdp-client2-2 libpango1.0-dev \
-    libssh2-1-dev libtelnet-dev libvncserver-dev \
+    libtelnet-dev libvncserver-dev \
     libpulse-dev libssl-dev libvorbis-dev libwebp-dev libwebsockets-dev \
     ghostscript build-essential postgresql-${PG_MAJOR} \
   && rm -rf /var/lib/apt/lists/*
 
+# Build & install libssh2
+ADD https://www.libssh2.org/download/libssh2-1.11.0.tar.gz /tmp
+RUN tar -xzvf /tmp/libssh2-1.11.0.tar.gz \
+  && cd libssh2-1.11.0 \
+  && ./configure \
+  && make \
+  && make install \
+  && cd .. \
+  && rm -rf libssh2-1.11.0.tar.gz libssh2-1.11.0
 
 # Apply the s6-overlay
 ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.3/s6-overlay-amd64.tar.gz /tmp
