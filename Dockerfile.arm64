@@ -11,7 +11,7 @@ ENV GUAC_VER=1.5.4 \
 # Install dependencies
 RUN apt-get update \
  && apt-get install -y curl ca-certificates gnupg \
-    libcairo2-dev libjpeg62-turbo-dev libpng-dev libavformat-dev libwebsockets-dev\
+    libcairo2-dev libjpeg62-turbo-dev libpng-dev libavformat-dev \
     libossp-uuid-dev libavcodec-dev libavutil-dev \
     libswscale-dev freerdp2-dev libfreerdp-client2-2 libpango1.0-dev \
     libtelnet-dev libvncserver-dev \
