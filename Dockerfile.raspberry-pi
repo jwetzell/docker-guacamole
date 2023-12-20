@@ -1,24 +1,42 @@
 FROM arm32v7/tomcat:9-jre11
 
-ENV GUAC_VER=1.5.2 \
+ENV GUAC_VER=1.5.4 \
     GUACAMOLE_HOME=/app/guacamole \
-    PG_MAJOR=9.6 \
+    PG_VER=9.6.24 \
+    LIBSSH2_VER=1.11.0 \
     PGDATA=/config/postgres \
     POSTGRES_USER=guacamole \
     POSTGRES_DB=guacamole_db
 
 # Install base dependencies
 RUN apt-get update \ 
- && apt-get install -y --allow-unauthenticated \
-    libcairo2-dev libjpeg62-turbo-dev libpng-dev \
+ && apt-get install -y curl ca-certificates gnupg \
+    libcairo2-dev libjpeg-turbo8-dev libpng-dev libavformat-dev \
     libossp-uuid-dev libavcodec-dev libavutil-dev \
     libswscale-dev freerdp2-dev libfreerdp-client2-2 libpango1.0-dev \
-    libssh2-1-dev libtelnet-dev libvncserver-dev \
+    libtelnet-dev libvncserver-dev \
     libpulse-dev libssl-dev libvorbis-dev libwebp-dev libwebsockets-dev \
-    ghostscript
+    ghostscript build-essential libreadline-dev
 
-# Install Postgres
-RUN apt-get install -y postgresql-${PG_MAJOR}
+# Build & install libssh2
+ADD https://www.libssh2.org/download/libssh2-${LIBSSH2_VER}.tar.gz /tmp
+RUN tar -xzvf /tmp/libssh2-${LIBSSH2_VER}.tar.gz \
+  && cd libssh2-${LIBSSH2_VER} \
+  && ./configure \
+  && make \
+  && make install \
+  && rm -rf /tmp/libssh2-${LIBSSH2_VER}*
+
+# Build & install postgresql
+ADD https://ftp.postgresql.org/pub/source/v${PG_VER}/postgresql-${PG_VER}.tar.gz /tmp
+RUN tar -xzvf /tmp/postgresql-${PG_VER}.tar.gz \
+  && cd postgresql-${PG_VER} \
+  && ./configure \
+  && make \
+  && make install \
+  && rm -rf /tmp/postgresql-${PG_VER}*
+
+RUN useradd postgres
 
 # Apply the s6-overlay
 ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.3/s6-overlay-armhf.tar.gz /tmp
@@ -85,7 +103,7 @@ RUN set -xe \
     && rm -rf guacamole-${i}-${GUAC_VER} guacamole-${i}-${GUAC_VER}.tar.gz \
   ;done
 
-ENV PATH=/usr/lib/postgresql/${PG_MAJOR}/bin:$PATH
+ENV PATH="/usr/local/pgsql/bin:$PATH"
 ENV GUACAMOLE_HOME=/config/guacamole
 
 WORKDIR /config
