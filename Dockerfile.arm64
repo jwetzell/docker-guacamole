@@ -16,8 +16,7 @@ RUN apt-get update \
     libswscale-dev freerdp2-dev libfreerdp-client2-2 libpango1.0-dev \
     libtelnet-dev libvncserver-dev \
     libpulse-dev libssl-dev libvorbis-dev libwebp-dev libwebsockets-dev \
-    ghostscript build-essential libreadline-dev \
-  && rm -rf /var/lib/apt/lists/*
+    ghostscript build-essential libreadline-dev
 
 # Build & install libssh2
 ADD https://www.libssh2.org/download/libssh2-${LIBSSH2_VER}.tar.gz /tmp
