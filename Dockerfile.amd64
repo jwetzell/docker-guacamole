@@ -3,11 +3,7 @@ FROM library/tomcat:9-jre11-openjdk-bullseye
 ENV ARCH=amd64 \
     GUAC_VER=1.5.4 \
     GUACAMOLE_HOME=/app/guacamole \
-    PG_VER=9.6.24 \
-    LIBSSH2_VER=1.11.0 \
-    PGDATA=/config/postgres \
-    POSTGRES_USER=guacamole \
-    POSTGRES_DB=guacamole_db
+    LIBSSH2_VER=1.11.0
 
 # Install dependencies
 RUN apt-get update \
@@ -28,17 +24,6 @@ RUN tar -xzvf /tmp/libssh2-${LIBSSH2_VER}.tar.gz \
   && make \
   && make install \
   && rm -rf /tmp/libssh2-${LIBSSH2_VER}*
-
-# Build & install postgresql
-ADD https://ftp.postgresql.org/pub/source/v${PG_VER}/postgresql-${PG_VER}.tar.gz /tmp
-RUN tar -xzvf /tmp/postgresql-${PG_VER}.tar.gz \
-  && cd postgresql-${PG_VER} \
-  && ./configure \
-  && make \
-  && make install \
-  && rm -rf /tmp/postgresql-${PG_VER}*
-
-RUN useradd postgres
 
 # Apply the s6-overlay
 ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.3/s6-overlay-amd64.tar.gz /tmp
@@ -71,18 +56,15 @@ RUN curl -SLO "https://archive.apache.org/dist/guacamole/${GUAC_VER}/source/guac
 # Create directory for extensions
 RUN mkdir ${GUACAMOLE_HOME}/extensions-available
 
-# Install guacamole-client and postgres auth adapter
+# Install guacamole-client
 RUN set -x \
   && rm -rf ${CATALINA_HOME}/webapps/ROOT \
   && curl -SLo ${CATALINA_HOME}/webapps/ROOT.war "https://archive.apache.org/dist/guacamole/${GUAC_VER}/binary/guacamole-${GUAC_VER}.war" \
-  && curl -SLo ${GUACAMOLE_HOME}/lib/postgresql-42.1.4.jar "https://jdbc.postgresql.org/download/postgresql-42.2.24.jar" \
   && curl -SLO "https://archive.apache.org/dist/guacamole/${GUAC_VER}/binary/guacamole-auth-jdbc-${GUAC_VER}.tar.gz" \
   && tar -xzf guacamole-auth-jdbc-${GUAC_VER}.tar.gz \
-  && cp guacamole-auth-jdbc-${GUAC_VER}/postgresql/guacamole-auth-jdbc-postgresql-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions/ \
   && cp guacamole-auth-jdbc-${GUAC_VER}/postgresql/guacamole-auth-jdbc-postgresql-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
   && cp guacamole-auth-jdbc-${GUAC_VER}/mysql/guacamole-auth-jdbc-mysql-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
   && cp guacamole-auth-jdbc-${GUAC_VER}/sqlserver/guacamole-auth-jdbc-sqlserver-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
-  && cp -R guacamole-auth-jdbc-${GUAC_VER}/postgresql/schema ${GUACAMOLE_HOME}/ \
   && rm -rf guacamole-auth-jdbc-${GUAC_VER} guacamole-auth-jdbc-${GUAC_VER}.tar.gz
 
 # add auth-sso to available extensions folder structur differs from other extensions
