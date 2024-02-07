@@ -1,4 +1,4 @@
-FROM library/tomcat:9-jre11-openjdk-bullseye
+FROM tomcat:9.0.85-jre11
 
 ENV ARCH=amd64 \
     GUAC_VER=1.5.4 \
@@ -8,11 +8,13 @@ ENV ARCH=amd64 \
     PGDATA=/config/postgres \
     POSTGRES_USER=guacamole \
     POSTGRES_DB=guacamole_db
+    
+RUN rm -rf /usr/local/tomcat/webapps.dist
 
 # Install dependencies
 RUN apt-get update \
  && apt-get install -y curl ca-certificates gnupg \
-    libcairo2-dev libjpeg62-turbo-dev libpng-dev libavformat-dev \
+    libcairo2-dev libjpeg-turbo8-dev libpng-dev libavformat-dev \
     libossp-uuid-dev libavcodec-dev libavutil-dev \
     libswscale-dev freerdp2-dev libfreerdp-client2-2 libpango1.0-dev \
     libtelnet-dev libvncserver-dev \
@@ -41,10 +43,10 @@ RUN tar -xzvf /tmp/postgresql-${PG_VER}.tar.gz \
 RUN useradd postgres
 
 # Apply the s6-overlay
-ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.3/s6-overlay-amd64.tar.gz /tmp
-RUN tar -xzf /tmp/s6-overlay-amd64.tar.gz -C / \
- && tar -xzf /tmp/s6-overlay-amd64.tar.gz -C /usr ./bin \
- && rm -rf /tmp/s6-overlay-amd64.tar.gz
+ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.3/s6-overlay-amd64-installer /tmp/
+RUN chmod +x /tmp/s6-overlay-amd64-installer && /tmp/s6-overlay-amd64-installer / \
+    && rm -rf /tmp/s6-overlay-amd64-installer
+
 
 RUN mkdir -p ${GUACAMOLE_HOME} \
     ${GUACAMOLE_HOME}/lib \

@@ -1,4 +1,4 @@
-FROM arm32v7/tomcat:9-jre11
+FROM arm32v7/tomcat:9.0.85-jre11
 
 ENV GUAC_VER=1.5.4 \
     GUACAMOLE_HOME=/app/guacamole \
@@ -7,6 +7,8 @@ ENV GUAC_VER=1.5.4 \
     PGDATA=/config/postgres \
     POSTGRES_USER=guacamole \
     POSTGRES_DB=guacamole_db
+
+RUN rm -rf /usr/local/tomcat/webapps.dist
 
 # Install base dependencies
 RUN apt-get update \ 
@@ -39,10 +41,9 @@ RUN tar -xzvf /tmp/postgresql-${PG_VER}.tar.gz \
 RUN useradd postgres
 
 # Apply the s6-overlay
-ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.3/s6-overlay-armhf.tar.gz /tmp
-RUN tar -xzf /tmp/s6-overlay-armhf.tar.gz -C / \
- && tar -xzf /tmp/s6-overlay-armhf.tar.gz -C /usr ./bin \
- && rm -rf /tmp/s6-overlay-armhf.tar.gz
+ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.3/s6-overlay-armhf-installer /tmp/
+RUN chmod +x /tmp/s6-overlay-armhf-installer && /tmp/s6-overlay-armhf-installer / \
+    && rm -rf /tmp/s6-overlay-armhf-installer
 
 RUN mkdir -p ${GUACAMOLE_HOME} \
     ${GUACAMOLE_HOME}/lib \
