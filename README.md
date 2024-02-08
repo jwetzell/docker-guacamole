@@ -23,13 +23,13 @@ docker run \
 
 ## Raspberry Pi / ARMv7
 
-This image will also allow you to run [Apache Guacamole](https://guacamole.apache.org/) on a Raspberry Pi or other Docker-enabled ARMv5/6/7/8 devices by using the `arm32v7` tag.
+Now that the image has been converted to a multi-platform image the command for Raspberry Pi's or other ARM devices is the same.
 
 ```shell
 docker run \
   -p 8080:8080 \
   -v </path/to/config>:/config \
-  jwetzell/guacamole:arm32v7
+  jwetzell/guacamole
 ```
 
 ## Parameters
