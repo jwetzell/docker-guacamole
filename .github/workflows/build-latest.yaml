@@ -1,6 +1,7 @@
 name: build-latest
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'Dockerfile'
