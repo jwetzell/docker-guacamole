@@ -1,7 +1,7 @@
 #!/usr/bin/with-contenv sh
 
 echo "Cleaning Extensions from previous Guacamole versions"
-for e in $(ls -1 ${GUACAMOLE_HOME}/extensions | grep -v ${GUAC_VER}); do
+for e in $(ls -1 ${GUACAMOLE_HOME}/extensions | grep guacamole | grep -v ${GUAC_VER}); do
   rm ${GUACAMOLE_HOME}/extensions/${e}
 done
 
