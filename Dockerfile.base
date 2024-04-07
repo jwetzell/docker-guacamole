@@ -1,6 +1,6 @@
 FROM tomcat:9.0.85-jre11
 
-ENV GUAC_VER=1.5.4 \
+ENV GUAC_VER=1.5.5 \
     GUACAMOLE_HOME=/app/guacamole \
     PG_VER=9.6.24 \
     LIBSSH2_VER=1.11.0 \
