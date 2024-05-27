@@ -18,7 +18,7 @@ This container runs the guacamole web client, the guacd server and a postgres da
 docker run \
   -p 8080:8080 \
   -v </path/to/config>:/config \
-  jwetzell/guacamole
+  jwetzell/guacamole:1.5.5
 ```
 
 ## Raspberry Pi / ARMv7
@@ -29,7 +29,7 @@ Now that the image has been converted to a multi-platform image the command for 
 docker run \
   -p 8080:8080 \
   -v </path/to/config>:/config \
-  jwetzell/guacamole
+  jwetzell/guacamole:1.5.5
 ```
 
 ## Parameters
@@ -51,7 +51,7 @@ docker run \
   -p 8080:8080 \
   -v </path/to/config>:/config \
   -e "EXTENSIONS=auth-ldap,auth-duo"
-  jwetzell/guacamole
+  jwetzell/guacamole:1.5.5
 ```
 
 Currently the available extensions are:
@@ -85,7 +85,7 @@ Mapped volumes behave differently when running Docker for Windows and you may en
 version: "2"
 services:
   guacamole:
-    image: jwetzell/guacamole
+    image: jwetzell/guacamole:1.5.5
     container_name: guacamole
     volumes:
       - postgres:/config
