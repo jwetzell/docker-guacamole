@@ -5,6 +5,8 @@ on:
   push:
     paths:
       - 'Dockerfile.base'
+    branches:
+      - 'master'
 jobs:
   docker:
     runs-on: ubuntu-latest
