@@ -58,9 +58,6 @@ Currently the available extensions are:
 
 * auth-duo - [Duo two-factor authentication](https://guacamole.apache.org/doc/gug/duo-auth.html)
 * auth-header - [HTTP header authentication](https://guacamole.apache.org/doc/gug/header-auth.html)
-* auth-jdbc-mysql - [MySQL Authentication](https://guacamole.apache.org/doc/gug/jdbc-auth.html)
-* auth-jdbc-postgresql - [PostgreSQL Authentication](https://guacamole.apache.org/doc/gug/jdbc-auth.html)
-* auth-jdbc-sqlserver - [SQL Server Authentication](https://guacamole.apache.org/doc/gug/jdbc-auth.html)
 * auth-json - [Encrypted JSON Authentication](https://guacamole.apache.org/doc/gug/json-auth.html)
 * auth-ldap - [LDAP Authentication](https://guacamole.apache.org/doc/gug/ldap-auth.html)
 * auth-quickconnect - [Ad-hoc connections extension](https://guacamole.apache.org/doc/gug/adhoc-connections.html)
