@@ -56,6 +56,7 @@ docker run \
 
 Currently the available extensions are:
 
+* auth-ban - [Blocking brute-force attacks](https://guacamole.apache.org/doc/gug/auth-ban.html)
 * auth-duo - [Duo two-factor authentication](https://guacamole.apache.org/doc/gug/duo-auth.html)
 * auth-header - [HTTP header authentication](https://guacamole.apache.org/doc/gug/header-auth.html)
 * auth-json - [Encrypted JSON Authentication](https://guacamole.apache.org/doc/gug/json-auth.html)
@@ -64,6 +65,7 @@ Currently the available extensions are:
 * auth-sso-cas - [CAS Authentication](https://guacamole.apache.org/doc/gug/cas-auth.html)
 * auth-sso-openid - [OpenID Authentication](https://guacamole.apache.org/doc/gug/openid-auth.html)
 * auth-sso-saml - [SAML Authentication](https://guacamole.apache.org/doc/gug/saml-auth.html)
+* auth-restrict - [Login / Connection restrictions](https://guacamole.apache.org/doc/gug/auth-restrict.html)
 * auth-totp - [TOTP two-factor authentication](https://guacamole.apache.org/doc/gug/totp-auth.html)
 * history-recording-storage - [Session Recording Playback](https://guacamole.apache.org/doc/gug/recording-playback.html#)
 * vault - [Retrieving secrets from a vault](https://guacamole.apache.org/doc/gug/vault.html)
