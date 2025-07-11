@@ -52,7 +52,7 @@ RUN set -xe \
 
 # Add optional extensions
 RUN set -xe \
-  && for i in auth-duo auth-header auth-json auth-ldap auth-quickconnect auth-totp history-recording-storage; do \
+  && for i in auth-ban auth-duo auth-header auth-json auth-ldap auth-quickconnect auth-totp auth-restrict history-recording-storage; do \
     echo "https://archive.apache.org/dist/guacamole/${GUAC_VER}/binary/guacamole-${i}-${GUAC_VER}.tar.gz" \
     && curl -SLO "https://archive.apache.org/dist/guacamole/${GUAC_VER}/binary/guacamole-${i}-${GUAC_VER}.tar.gz" \
     && tar -xzf guacamole-${i}-${GUAC_VER}.tar.gz \
