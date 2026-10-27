@@ -30,6 +30,7 @@ Each parameter has two halves separated by a colon: the left side is the host, t
 * `-p 8080:8080` - Binds the service to port 8080 on the Docker host. **Required.**
 * `-v /config` - Location of the config and database. **Required.**
 * `-e EXTENSIONS` - Comma-separated list of Guacamole extensions to enable. See below.
+* `-e TRUSTED_PROXIES` - Reverse proxies allowed to report the real client IP. See [Running behind a reverse proxy](#running-behind-a-reverse-proxy).
 
 ## Enabling extensions
 
@@ -104,6 +105,47 @@ Then edit the files in `</path/to/config>/branding` and restart the container. W
 If your browser still shows the old look after a restart, do a hard refresh.
 
 The branding extension is adapted from [l4rm4nd/Guacamole-Custom-Login](https://github.com/l4rm4nd/Guacamole-Custom-Login) (GPL-3.0), which builds on the approach of [Zer0CoolX/guacamole-customize-loginscreen-extension](https://github.com/Zer0CoolX/guacamole-customize-loginscreen-extension).
+
+## Running behind a reverse proxy
+
+By default, Guacamole sees the IP of whatever connects to the container. Behind a reverse proxy (nginx, Traefik, Caddy), that is the proxy itself, so every client looks the same. Login history shows one address for everyone. With `auth-ban` enabled, a few failed logins from any one client lock out all users.
+
+Set `TRUSTED_PROXIES` to your proxy's IP, and Guacamole uses the client IP from the proxy's `X-Forwarded-For` header instead:
+
+```yaml
+services:
+  guacamole:
+    image: <registry>/<your-user>/guac-forge:<tag>
+    environment:
+      - TRUSTED_PROXIES=172.30.0.10
+    volumes:
+      - postgres:/config
+    networks:
+      proxy:
+        ipv4_address: 172.30.0.5
+  nginx:
+    image: nginx:alpine
+    ports:
+      - 443:443
+    networks:
+      proxy:
+        ipv4_address: 172.30.0.10
+networks:
+  proxy:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+volumes:
+  postgres:
+    driver: local
+```
+
+The proxy must send `X-Forwarded-For`. For nginx, use `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;`.
+
+* The value is a comma-separated list of IPs, or CIDR ranges ending in `/8`, `/16`, `/24` or `/32`. Unsupported entries are skipped with a message in the container log.
+* **Trust only the proxy's exact IP**, and give the proxy a fixed address as in the example. Any address you list can claim to be any client.
+* **Do not trust a whole Docker network while Guacamole's port is published.** Requests to a published port arrive from the network's gateway (for example `172.30.0.1`), which is inside the network's range. Anyone who can reach the port could then fake their IP and get around `auth-ban`. If you must trust a range, do not publish port 8080, so all traffic goes through the proxy.
+* Leave `TRUSTED_PROXIES` unset when clients connect to the container directly.
 
 ## Default user
 
