@@ -153,23 +153,24 @@ The default username is `guacadmin` with the password `guacadmin`. **Change this
 
 ## Docker Compose
 
-```yaml
-services:
-  guacamole:
-    image: ghcr.io/justinkocian/guac-forge:latest
-    container_name: guacamole
-    volumes:
-      - postgres:/config
-    ports:
-      - 8080:8080
-volumes:
-  postgres:
-    driver: local
+The repository includes a ready-to-use [docker-compose.yml](docker-compose.yml). Download it, edit the `environment` section, and start it:
+
+```shell
+curl -LO https://raw.githubusercontent.com/justinKocian/guac-forge/master/docker-compose.yml
+docker compose up -d
 ```
+
+Every option is listed in the file with a comment, including extensions, branding, and `TRUSTED_PROXIES`. Empty values use the defaults.
+
+### Setting guacamole.properties with environment variables
+
+Any [`guacamole.properties` setting](https://guacamole.apache.org/doc/gug/configuring-guacamole.html) can be set as an environment variable instead of editing the file in the config volume. Use uppercase and replace dashes with underscores. For example, `ldap-hostname` becomes `LDAP_HOSTNAME`. Environment variables take precedence over the file. The compose file has commented examples for LDAP, OpenID, TOTP, and `auth-ban`.
+
+To upgrade, run `docker compose pull && docker compose up -d`. Your data stays in the `guac-config` volume.
 
 ### Windows-based Docker hosts
 
-Bind-mounted volumes behave differently under Docker for Windows, and you may hit PostgreSQL file-permission problems. Using a named volume with the `local` driver, as in the example above, avoids this and keeps your config across upgrades and container recreation. Stop the container gracefully, or data may be lost.
+Bind-mounted volumes behave differently under Docker for Windows, and you may hit PostgreSQL file-permission problems. The included compose file uses a named volume, which avoids this and keeps your config across upgrades and container recreation. Stop the container gracefully (the compose file allows one minute), or data may be lost.
 
 ## Build from source
 

@@ -8,7 +8,11 @@ case ",${EXTENSIONS}," in
 esac
 
 SRC=/app/branding
-[ -d /config/branding ] && SRC=/config/branding
+if [ -f /config/branding/guac-manifest.json ]; then
+  SRC=/config/branding
+elif [ -d /config/branding ]; then
+  echo "/config/branding has no guac-manifest.json, using the default branding"
+fi
 echo "Building branding extension from ${SRC}"
 
 BUILD=$(mktemp -d)

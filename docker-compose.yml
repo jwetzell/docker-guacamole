@@ -1,0 +1,74 @@
+# Guac-Forge: Apache Guacamole web app, guacd and PostgreSQL in one container.
+#
+# 1. Edit the environment section below. Empty values mean "use the default".
+# 2. Start it:  docker compose up -d
+# 3. Open http://<host>:8080 and log in as guacadmin / guacadmin.
+#    Change that password right away.
+#
+# All data (database and config) lives in the guac-config volume, so it
+# survives upgrades:  docker compose pull && docker compose up -d
+
+services:
+  guacamole:
+    image: ghcr.io/justinkocian/guac-forge:latest
+    container_name: guacamole
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - guac-config:/config
+      # Full branding control: copy the defaults out once, edit, restart.
+      #   docker cp guacamole:/app/branding ./branding
+      # - ./branding:/config/branding
+    # Give PostgreSQL time to shut down cleanly
+    stop_grace_period: 1m
+    environment:
+      # Extensions to enable, comma-separated with no spaces. Available:
+      #   auth-ban, auth-duo, auth-header, auth-json, auth-ldap,
+      #   auth-quickconnect, auth-restrict, auth-sso-cas, auth-sso-openid,
+      #   auth-sso-saml, auth-totp, branding, history-recording-storage, vault-ksm
+      # Example: "auth-ban,auth-totp,branding"
+      EXTENSIONS: ""
+
+      # Login page branding (needs "branding" in EXTENSIONS)
+      BRANDING_TITLE: ""
+      BRANDING_SUBTITLE: ""
+      BRANDING_SSO_TEXT: ""        # SSO button label
+      BRANDING_SHOW_LOCAL: ""      # true/false, username + password form (default true)
+      BRANDING_SHOW_SSO: ""        # true/false (default true only with an auth-sso-* extension)
+
+      # Behind a reverse proxy: the proxy's exact IP, so Guacamole sees real
+      # client IPs. Leave empty when clients connect directly. See README.
+      TRUSTED_PROXIES: ""
+
+      # Any guacamole.properties setting works here: uppercase, with dashes
+      # as underscores. Uncomment and fill in what your extensions need.
+      #
+      # auth-ban
+      # BAN_MAX_INVALID_ATTEMPTS: "5"
+      # BAN_ADDRESS_DURATION: "300"
+      #
+      # auth-ldap
+      # LDAP_HOSTNAME: "ldap.example.net"
+      # LDAP_PORT: "389"
+      # LDAP_ENCRYPTION_METHOD: "none"
+      # LDAP_USER_BASE_DN: "ou=people,dc=example,dc=net"
+      # LDAP_USERNAME_ATTRIBUTE: "uid"
+      # LDAP_SEARCH_BIND_DN: ""
+      # LDAP_SEARCH_BIND_PASSWORD: ""
+      #
+      # auth-sso-openid
+      # OPENID_AUTHORIZATION_ENDPOINT: "https://idp.example.net/authorize"
+      # OPENID_JWKS_ENDPOINT: "https://idp.example.net/jwks"
+      # OPENID_ISSUER: "https://idp.example.net"
+      # OPENID_CLIENT_ID: "guacamole"
+      # OPENID_REDIRECT_URI: "https://guac.example.net/"
+      #
+      # auth-totp
+      # TOTP_ISSUER: "Guac-Forge"
+      #
+      # REST API session timeout, in minutes
+      # API_SESSION_TIMEOUT: "60"
+
+volumes:
+  guac-config:
