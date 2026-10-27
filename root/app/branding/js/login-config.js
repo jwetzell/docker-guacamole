@@ -38,4 +38,20 @@ window.guacBrandingConfig = {
     appTitle:    "Guacamole - Remote Access",
     appSubtitle: null,
 
+    /* ------------------------------------------------------------------
+     * Environment badge (Guac-Forge, see env-notice.js)
+     * envLabel  — e.g. "PROD"; null hides the badge.
+     * envColor  — any CSS colour; null picks one from the label
+     *             (PROD red, STAGING/TEST/UAT/QA amber, otherwise green).
+     * ------------------------------------------------------------------ */
+    envLabel: null,
+    envColor: null,
+
+    /* ------------------------------------------------------------------
+     * Notice banner (Guac-Forge, see env-notice.js)
+     * Dismissible message on every page except remote sessions; links
+     * become clickable. null hides it.
+     * ------------------------------------------------------------------ */
+    notice: null,
+
 };

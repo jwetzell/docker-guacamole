@@ -9,13 +9,15 @@
     ],
 
     "css" : [
-        "css/modern-login.css"
+        "css/modern-login.css",
+        "css/env-notice.css"
     ],
 
     "js" : [
         "js/login-config.js",
         "js/env-config.js",
-        "js/modern-login.js"
+        "js/modern-login.js",
+        "js/env-notice.js"
     ],
 
     "resources" : {

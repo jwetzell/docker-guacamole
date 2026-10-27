@@ -87,6 +87,11 @@ These environment variables cover the common changes:
 * `BRANDING_SSO_TEXT` - Label for the SSO button, when exactly one SSO provider is enabled.
 * `BRANDING_SHOW_LOCAL` - `true` or `false`. Show the username and password form. Defaults to `true`.
 * `BRANDING_SHOW_SSO` - `true` or `false`. Show the SSO button. Defaults to `true` only when an `auth-sso-*` extension is enabled.
+* `BRANDING_ENV_LABEL` - Environment name, such as `PROD` or `LAB`. Shows a colored stripe across the top of every page with the label in a tab, so users always know which environment they are in.
+* `BRANDING_ENV_COLOR` - Color for the environment stripe, as any CSS color. When unset, it follows the label: red for `PROD`, amber for `STAGING`, `TEST`, `UAT` or `QA`, and green for anything else.
+* `BRANDING_NOTICE` - Message shown in a banner at the bottom of every page, such as a maintenance window. Links starting with `http://` or `https://` become clickable. Users can dismiss it, and it reappears when the message changes.
+
+The environment stripe and notice banner are hidden during remote desktop sessions, so they never cover the remote screen.
 
 ### Full control
 

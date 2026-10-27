@@ -38,18 +38,26 @@ else
   esac
 fi
 
+# printf, not echo: dash's echo turns the escaped "\\" back into "\"
+line() {
+  printf '%s\n' "$1"
+}
+
 {
-  echo "Object.assign(window.guacBrandingConfig = window.guacBrandingConfig || {}, {"
-  [ -n "${SHOW_SSO}" ] && echo "    showOidcAuth: ${SHOW_SSO},"
-  [ -n "${BRANDING_SHOW_LOCAL}" ] && echo "    showLocalAuth: $(bool ${BRANDING_SHOW_LOCAL}),"
-  [ -n "${BRANDING_SSO_TEXT}" ] && echo "    oidcButtonText: $(json "${BRANDING_SSO_TEXT}"),"
-  [ -n "${BRANDING_TITLE}" ] && echo "    appTitle: $(json "${BRANDING_TITLE}"),"
-  [ -n "${BRANDING_SUBTITLE}" ] && echo "    appSubtitle: $(json "${BRANDING_SUBTITLE}"),"
-  echo "});"
+  line "Object.assign(window.guacBrandingConfig = window.guacBrandingConfig || {}, {"
+  [ -n "${SHOW_SSO}" ] && line "    showOidcAuth: ${SHOW_SSO},"
+  [ -n "${BRANDING_SHOW_LOCAL}" ] && line "    showLocalAuth: $(bool ${BRANDING_SHOW_LOCAL}),"
+  [ -n "${BRANDING_SSO_TEXT}" ] && line "    oidcButtonText: $(json "${BRANDING_SSO_TEXT}"),"
+  [ -n "${BRANDING_TITLE}" ] && line "    appTitle: $(json "${BRANDING_TITLE}"),"
+  [ -n "${BRANDING_SUBTITLE}" ] && line "    appSubtitle: $(json "${BRANDING_SUBTITLE}"),"
+  [ -n "${BRANDING_ENV_LABEL}" ] && line "    envLabel: $(json "${BRANDING_ENV_LABEL}"),"
+  [ -n "${BRANDING_ENV_COLOR}" ] && line "    envColor: $(json "${BRANDING_ENV_COLOR}"),"
+  [ -n "${BRANDING_NOTICE}" ] && line "    notice: $(json "${BRANDING_NOTICE}"),"
+  line "});"
 } > ${BUILD}/js/env-config.js
 
 if [ -n "${BRANDING_TITLE}" ]; then
-  echo "{ \"APP\" : { \"NAME\" : $(json "${BRANDING_TITLE}") } }" > ${BUILD}/translations/env/en.json
+  line "{ \"APP\" : { \"NAME\" : $(json "${BRANDING_TITLE}") } }" > ${BUILD}/translations/env/en.json
 else
   echo "{}" > ${BUILD}/translations/env/en.json
 fi

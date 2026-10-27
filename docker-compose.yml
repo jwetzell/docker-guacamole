@@ -36,6 +36,9 @@ services:
       BRANDING_SSO_TEXT: ""        # SSO button label
       BRANDING_SHOW_LOCAL: ""      # true/false, username + password form (default true)
       BRANDING_SHOW_SSO: ""        # true/false (default true only with an auth-sso-* extension)
+      BRANDING_ENV_LABEL: ""       # e.g. PROD: coloured stripe + label at the top of every page
+      BRANDING_ENV_COLOR: ""       # CSS colour; default red for PROD, amber for STAGING/TEST/UAT/QA, else green
+      BRANDING_NOTICE: ""          # dismissible banner, e.g. "Maintenance Sat 02:00-04:00 https://status.example.net"
 
       # Behind a reverse proxy: the proxy's exact IP, so Guacamole sees real
       # client IPs. Leave empty when clients connect directly. See README.

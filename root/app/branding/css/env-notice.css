@@ -1,0 +1,97 @@
+/* ============================================================
+   Guac-Forge — Environment badge and notice banner
+   See js/env-notice.js. Both sit above Guacamole's own UI and are
+   hidden in the remote desktop view so they never cover a session.
+   ============================================================ */
+
+/* --- Environment badge: top stripe with a hanging label ---- */
+.gf-env-badge {
+    position:       fixed;
+    top:            0;
+    left:           0;
+    right:          0;
+    height:         4px;
+    background:     var(--gf-env-color, #16a34a);
+    z-index:        2147483000;
+    pointer-events: none;
+}
+
+.gf-env-badge-label {
+    position:       absolute;
+    top:            4px;
+    left:           50%;
+    transform:      translateX(-50%);
+    padding:        2px 12px 3px;
+    border-radius:  0 0 6px 6px;
+    background:     var(--gf-env-color, #16a34a);
+    color:          #fff;
+    font:           700 11px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space:    nowrap;
+    box-shadow:     0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* --- Notice banner: dismissible toast, bottom centre ------- */
+.gf-notice {
+    position:       fixed;
+    left:           50%;
+    bottom:         16px;
+    transform:      translateX(-50%);
+    width:          max-content;
+    max-width:      calc(100vw - 32px);
+    box-sizing:     border-box;
+    display:        flex;
+    align-items:    flex-start;
+    gap:            12px;
+    padding:        10px 10px 10px 16px;
+    border-radius:  8px;
+    border-left:    4px solid var(--gb-accent, #2563eb);
+    background:     var(--gb-card, #161b22);
+    color:          var(--gb-text, #e6edf3);
+    box-shadow:     0 8px 24px rgba(0, 0, 0, 0.35);
+    font:           14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+    z-index:        2147483000;
+}
+
+.gf-notice-text {
+    padding-top:    2px;
+    overflow-wrap:  anywhere;
+}
+
+.gf-notice-text a {
+    color:          inherit;
+    text-decoration: underline;
+}
+
+.gf-notice-close {
+    flex:           none;
+    width:          28px;
+    height:         28px;
+    margin:         0;
+    padding:        0;
+    border:         0;
+    border-radius:  6px;
+    background:     transparent;
+    color:          inherit;
+    font-size:      20px;
+    line-height:    28px;
+    cursor:         pointer;
+    opacity:        0.7;
+    /* Guacamole styles all buttons; undo the parts that matter */
+    min-width:      0;
+    box-shadow:     none;
+    text-shadow:    none;
+}
+
+.gf-notice-close:hover,
+.gf-notice-close:focus-visible {
+    opacity:        1;
+    background:     rgba(255, 255, 255, 0.08);
+}
+
+/* --- Never cover a remote desktop session ------------------ */
+body.client .gf-env-badge,
+body.client .gf-notice {
+    display:        none;
+}
