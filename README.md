@@ -1,16 +1,14 @@
-[![Docker Pulls](https://img.shields.io/docker/pulls/jwetzell/guacamole?label=pulls) ![Docker Stars](https://img.shields.io/docker/stars/jwetzell/guacamole?label=stars)](https://hub.docker.com/r/jwetzell/guacamole)
+# Guac-Forge
 
-# Docker Guacamole
+A Docker image for [Apache Guacamole](https://guacamole.apache.org/), the clientless remote desktop gateway. It supports VNC, RDP, and SSH over HTML5 from a single self-contained container: the Guacamole web client, the `guacd` server, and a PostgreSQL database.
 
-**THIS REPO IS A CONTINUATION OF [oznu/docker-guacamole](https://github.com/oznu/docker-guacamole).**
+> **Status:** early-stage fork and learning project. Expect frequent small changes while I work on CI, version bumps, and reliability fixes. See the [Roadmap](#roadmap).
 
-A Docker Container for [Apache Guacamole](https://guacamole.apache.org/), a client-less remote desktop gateway. It supports standard protocols like VNC, RDP, and SSH over HTML5.
+## Lineage and attribution
 
-This image will run on most platforms that support Docker including Docker for Mac, Docker for Windows, Synology DSM and Raspberry Pi 3 boards.
+Guac-Forge is a fork of [jwetzell/docker-guacamole](https://github.com/jwetzell/docker-guacamole), which is itself a continuation of [oznu/docker-guacamole](https://github.com/oznu/docker-guacamole). Thanks to both authors for the original work. Their history is preserved in this repository.
 
-[![IMAGE ALT TEXT](http://img.youtube.com/vi/esgaHNRxdhY/0.jpg)](http://www.youtube.com/watch?v=esgaHNRxdhY "Video Title")
-
-This container runs the guacamole web client, the guacd server and a postgres database.
+Guac-Forge is an independent project. It is not affiliated with, endorsed by, or sponsored by the Apache Software Foundation. Apache Guacamole, Guacamole, Apache, and the Apache feather logo are trademarks of the Apache Software Foundation.
 
 ## Usage
 
@@ -18,73 +16,61 @@ This container runs the guacamole web client, the guacd server and a postgres da
 docker run \
   -p 8080:8080 \
   -v </path/to/config>:/config \
-  jwetzell/guacamole:1.6.0-20250711
+  <registry>/<your-user>/guac-forge:<tag>
 ```
 
-## Raspberry Pi / ARMv7
+Until the first Guac-Forge release is published, [build from source](#build-from-source).
 
-Now that the image has been converted to a multi-platform image the command for Raspberry Pi's or other ARM devices is the same.
-
-```shell
-docker run \
-  -p 8080:8080 \
-  -v </path/to/config>:/config \
-  jwetzell/guacamole:1.6.0-20250711
-```
+The image is multi-platform and runs on amd64 and ARM hosts, including Raspberry Pi boards, using the same command on every platform. It also runs on Docker Desktop for Mac and Windows and on Synology DSM.
 
 ## Parameters
 
-The parameters are split into two halves, separated by a colon, the left hand side representing the host and the right the container side.
+Each parameter has two halves separated by a colon: the left side is the host, the right side is the container.
 
-* `-p 8080:8080` - Binds the service to port 8080 on the Docker host, **required**
-* `-v /config` - The config and database location, **required**
-* `-e EXTENSIONS` - See below for details.
+* `-p 8080:8080` - Binds the service to port 8080 on the Docker host. **Required.**
+* `-v /config` - Location of the config and database. **Required.**
+* `-e EXTENSIONS` - Comma-separated list of Guacamole extensions to enable. See below.
 
-## Enabling Extensions
+## Enabling extensions
 
-Extensions can be enabled using the `-e EXTENSIONS` variable. Multiple extensions can be enabled using a comma separated list without spaces.
-
-For example:
+Enable extensions with the `EXTENSIONS` variable, as a comma-separated list with no spaces:
 
 ```shell
 docker run \
   -p 8080:8080 \
   -v </path/to/config>:/config \
-  -e "EXTENSIONS=auth-ldap,auth-duo"
-  jwetzell/guacamole:1.6.0-20250711
+  -e "EXTENSIONS=auth-ldap,auth-duo" \
+  <registry>/<your-user>/guac-forge:<tag>
 ```
 
-Currently the available extensions are:
+Available extensions:
 
-* auth-ban - [Blocking brute-force attacks](https://guacamole.apache.org/doc/gug/auth-ban.html)
-* auth-duo - [Duo two-factor authentication](https://guacamole.apache.org/doc/gug/duo-auth.html)
-* auth-header - [HTTP header authentication](https://guacamole.apache.org/doc/gug/header-auth.html)
-* auth-json - [Encrypted JSON Authentication](https://guacamole.apache.org/doc/gug/json-auth.html)
-* auth-ldap - [LDAP Authentication](https://guacamole.apache.org/doc/gug/ldap-auth.html)
-* auth-quickconnect - [Ad-hoc connections extension](https://guacamole.apache.org/doc/gug/adhoc-connections.html)
-* auth-sso-cas - [CAS Authentication](https://guacamole.apache.org/doc/gug/cas-auth.html)
-* auth-sso-openid - [OpenID Authentication](https://guacamole.apache.org/doc/gug/openid-auth.html)
-* auth-sso-saml - [SAML Authentication](https://guacamole.apache.org/doc/gug/saml-auth.html)
-* auth-restrict - [Login / Connection restrictions](https://guacamole.apache.org/doc/gug/auth-restrict.html)
-* auth-totp - [TOTP two-factor authentication](https://guacamole.apache.org/doc/gug/totp-auth.html)
-* history-recording-storage - [Session Recording Playback](https://guacamole.apache.org/doc/gug/recording-playback.html#)
-* vault - [Retrieving secrets from a vault](https://guacamole.apache.org/doc/gug/vault.html)
+* `auth-ban` - [Blocking brute-force attacks](https://guacamole.apache.org/doc/gug/auth-ban.html)
+* `auth-duo` - [Duo two-factor authentication](https://guacamole.apache.org/doc/gug/duo-auth.html)
+* `auth-header` - [HTTP header authentication](https://guacamole.apache.org/doc/gug/header-auth.html)
+* `auth-json` - [Encrypted JSON authentication](https://guacamole.apache.org/doc/gug/json-auth.html)
+* `auth-ldap` - [LDAP authentication](https://guacamole.apache.org/doc/gug/ldap-auth.html)
+* `auth-quickconnect` - [Ad-hoc connections](https://guacamole.apache.org/doc/gug/adhoc-connections.html)
+* `auth-restrict` - [Login / connection restrictions](https://guacamole.apache.org/doc/gug/auth-restrict.html)
+* `auth-sso-cas` - [CAS authentication](https://guacamole.apache.org/doc/gug/cas-auth.html)
+* `auth-sso-openid` - [OpenID authentication](https://guacamole.apache.org/doc/gug/openid-auth.html)
+* `auth-sso-saml` - [SAML authentication](https://guacamole.apache.org/doc/gug/saml-auth.html)
+* `auth-totp` - [TOTP two-factor authentication](https://guacamole.apache.org/doc/gug/totp-auth.html)
+* `history-recording-storage` - [Session recording playback](https://guacamole.apache.org/doc/gug/recording-playback.html)
+* `vault` - [Retrieving secrets from a vault](https://guacamole.apache.org/doc/gug/vault.html)
 
-You should only enable the extensions you require, if an extensions is not configured correctly in the `guacamole.properties` file it may prevent the system from loading. See the [official documentation](https://guacamole.apache.org/doc/gug/) for more details.
+Only enable the extensions you need. An extension that is misconfigured in `guacamole.properties` can prevent the system from loading. See the [official documentation](https://guacamole.apache.org/doc/gug/) for details.
 
-## Default User
+## Default user
 
-The default username is `guacadmin` with password `guacadmin`.
+The default username is `guacadmin` with the password `guacadmin`. **Change this password immediately after your first login**, especially if the container is reachable from outside your local network.
 
-## Windows-based Docker Hosts
+## Docker Compose
 
-Mapped volumes behave differently when running Docker for Windows and you may encounter some issues with PostgreSQL file system permissions. To avoid these issues, and still retain your config between container upgrades and recreation, you can use the local volume driver, as shown in the `docker-compose.yml` example below. When using this setup be careful to gracefully stop the container or data may be lost.
-
-```yml
-version: "2"
+```yaml
 services:
   guacamole:
-    image: jwetzell/guacamole:1.6.0-20250711
+    image: <registry>/<your-user>/guac-forge:<tag>
     container_name: guacamole
     volumes:
       - postgres:/config
@@ -94,3 +80,42 @@ volumes:
   postgres:
     driver: local
 ```
+
+### Windows-based Docker hosts
+
+Bind-mounted volumes behave differently under Docker for Windows, and you may hit PostgreSQL file-permission problems. Using a named volume with the `local` driver, as in the example above, avoids this and keeps your config across upgrades and container recreation. Stop the container gracefully, or data may be lost.
+
+## Build from source
+
+```shell
+git clone https://github.com/<your-user>/guac-forge.git
+cd guac-forge
+docker build --pull -t guac-forge:dev .
+docker run -p 8080:8080 -v "$(pwd)/config:/config" guac-forge:dev
+```
+
+## Roadmap
+
+Planned work, roughly in order:
+
+- [ ] Publish the first tagged image from CI (multi-arch build)
+- [ ] Add a container healthcheck
+- [ ] Investigate the "pg_isready not found" error some users reported when upgrading from older images
+- [ ] Track current Apache Guacamole, Tomcat, and base-image releases
+- [ ] Add image vulnerability scanning to CI
+- [ ] Investigate the Duo extension's deprecated "Traditional Prompt" issue (the fix likely belongs upstream in Apache Guacamole)
+- [ ] Document a split compose setup (separate Postgres, `guacd`, and web app)
+
+## Contributing
+
+Issues and pull requests are welcome, including small documentation fixes.
+
+**AI-assisted contributions are welcome.** The bar is the same as for any other change: it must be correct, tested, and something you can explain.
+
+* You are the author of whatever you submit. "The tool wrote it" is not an answer to a review question.
+* Please mention in the PR description if AI tools helped, and what you did to verify the result.
+* Keep changes small and focused, and open an issue first for anything large.
+
+## License
+
+See [LICENSE](LICENSE). This project inherits the license of the upstream repositories it was forked from.
