@@ -1,0 +1,3 @@
+# Files copied into the image must keep LF endings, even on Windows checkouts
+root/** text eol=lf
+*.png binary

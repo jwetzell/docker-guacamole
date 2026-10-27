@@ -1,0 +1,24 @@
+{
+    "guacamoleVersion" : "*",
+    "name"             : "Modern Branding",
+    "namespace"        : "modern-branding",
+
+    "translations" : [
+        "translations/en.json",
+        "translations/env/en.json"
+    ],
+
+    "css" : [
+        "css/modern-login.css"
+    ],
+
+    "js" : [
+        "js/login-config.js",
+        "js/env-config.js",
+        "js/modern-login.js"
+    ],
+
+    "resources" : {
+        "images/logo.png" : "image/png"
+    }
+}

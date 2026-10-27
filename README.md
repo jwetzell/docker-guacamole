@@ -56,10 +56,54 @@ Available extensions:
 * `auth-sso-openid` - [OpenID authentication](https://guacamole.apache.org/doc/gug/openid-auth.html)
 * `auth-sso-saml` - [SAML authentication](https://guacamole.apache.org/doc/gug/saml-auth.html)
 * `auth-totp` - [TOTP two-factor authentication](https://guacamole.apache.org/doc/gug/totp-auth.html)
+* `branding` - Custom login page branding. See [Custom branding](#custom-branding)
 * `history-recording-storage` - [Session recording playback](https://guacamole.apache.org/doc/gug/recording-playback.html)
 * `vault` - [Retrieving secrets from a vault](https://guacamole.apache.org/doc/gug/vault.html)
 
 Only enable the extensions you need. An extension that is misconfigured in `guacamole.properties` can prevent the system from loading. See the [official documentation](https://guacamole.apache.org/doc/gug/) for details.
+
+## Custom branding
+
+The `branding` extension replaces the stock login page with a modern login card and lets you set your own title, logo, and colors. It is off by default. Enable it like any other extension:
+
+```shell
+docker run \
+  -p 8080:8080 \
+  -v </path/to/config>:/config \
+  -e "EXTENSIONS=branding" \
+  -e "BRANDING_TITLE=Acme Remote Access" \
+  <registry>/<your-user>/guac-forge:<tag>
+```
+
+The extension is rebuilt every time the container starts, so a restart applies any change. There is no manual zipping or jar building.
+
+### Quick settings
+
+These environment variables cover the common changes:
+
+* `BRANDING_TITLE` - Title on the login card and browser tab.
+* `BRANDING_SUBTITLE` - Text below the title. Hidden when unset.
+* `BRANDING_SSO_TEXT` - Label for the SSO button, when exactly one SSO provider is enabled.
+* `BRANDING_SHOW_LOCAL` - `true` or `false`. Show the username and password form. Defaults to `true`.
+* `BRANDING_SHOW_SSO` - `true` or `false`. Show the SSO button. Defaults to `true` only when an `auth-sso-*` extension is enabled.
+
+### Full control
+
+To change the logo, colors, or anything else, copy the default branding files out of the image into your config volume:
+
+```shell
+docker cp <container>:/app/branding </path/to/config>/branding
+```
+
+Then edit the files in `</path/to/config>/branding` and restart the container. When that folder exists, it is used instead of the built-in default.
+
+* `images/logo.png` - Login logo.
+* `css/modern-login.css` - Colors are CSS variables in the `:root` block at the top.
+* `js/login-config.js` - The same settings as the environment variables above. The environment variables win when both are set.
+
+If your browser still shows the old look after a restart, do a hard refresh.
+
+The branding extension is adapted from [l4rm4nd/Guacamole-Custom-Login](https://github.com/l4rm4nd/Guacamole-Custom-Login) (GPL-3.0), which builds on the approach of [Zer0CoolX/guacamole-customize-loginscreen-extension](https://github.com/Zer0CoolX/guacamole-customize-loginscreen-extension).
 
 ## Default user
 

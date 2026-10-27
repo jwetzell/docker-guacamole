@@ -1,0 +1,587 @@
+/* ============================================================
+   Modern Guacamole Login Branding
+   ============================================================
+   Targets Guacamole 1.5+ / 1.6+ (AngularJS UI).
+
+   Actual rendered DOM structure (guacamole-auth-sso 1.5+):
+
+     div.login-ui                      <- full-page container
+     +-div.login-dialog-middle          <- table-cell centering wrapper
+       +-div.login-dialog.notification  <- the card
+         +-form.login-form
+           +-div.logo
+           +-div.version
+             +-div.app-name            <- APP.NAME translation (title)
+             +-div.version-number      <- was position:abs green badge
+           +-div.login-fields
+             +-div.labeled-field       <- per-field (username/password)
+               +-div.field-header > label
+               +-div.form-field > input
+           +-div.buttons
+             +-input.login[type=submit]
+
+     div.sso-providers                 <- injected by guacamole-auth-sso
+       +-ul.sso-provider-list          <- was position:abs bottom-left;
+         +-li > a                         moved into card by modern-login.js
+
+   CSS custom properties:  edit the :root block to retheme.
+   ============================================================ */
+
+:root {
+    /* --- Palette -------------------------------------------- */
+    --gb-bg:            #0d1117;
+    --gb-bg2:           #161b22;
+    --gb-card:          #161b22;
+    --gb-card-border:   rgba(255, 255, 255, 0.08);
+    --gb-card-shadow:   0 0 0 1px rgba(255, 255, 255, 0.04),
+                        0 8px 32px rgba(0, 0, 0, 0.4),
+                        0 24px 80px rgba(0, 0, 0, 0.55);
+    --gb-accent-top:    rgba(59, 130, 246, 0.55);
+
+    /* --- Text ----------------------------------------------- */
+    --gb-text:          #e6edf3;
+    --gb-text2:         #8b949e;
+    --gb-text3:         #484f58;
+
+    /* --- Accent (primary / submit button) ------------------- */
+    --gb-accent:        #2563eb;
+    --gb-accent-h:      #1d4ed8;
+    --gb-accent-glow:   rgba(37, 99, 235, 0.25);
+
+    /* --- Input fields --------------------------------------- */
+    --gb-input-bg:      rgba(13, 17, 23, 0.85);
+    --gb-input-bd:      rgba(255, 255, 255, 0.09);
+    --gb-input-focus:   rgba(37, 99, 235, 0.5);
+
+    /* --- SSO / OIDC button ---------------------------------- */
+    --gb-sso-bd:        rgba(255, 255, 255, 0.12);
+    --gb-sso-h-bg:      rgba(255, 255, 255, 0.04);
+    --gb-sso-h-bd:      rgba(255, 255, 255, 0.22);
+
+    /* --- Shape & typography --------------------------------- */
+    --gb-r:             12px;
+    --gb-r-sm:          8px;
+    --gb-font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI",
+               Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ============================================================
+   Page / backdrop
+   ============================================================ */
+
+html, body {
+    margin:      0;
+    padding:     0;
+    height:      100%;
+    font-family: var(--gb-font);
+}
+
+/*
+ * Override Guacamole's default `display: table` layout with flexbox.
+ * `position: fixed` covers the full viewport even if body scrolls.
+ */
+div.login-ui,
+.login-ui {
+    position:        fixed !important;
+    inset:           0 !important;
+    display:         flex !important;
+    flex-direction:  column !important;
+    align-items:     center !important;
+    justify-content: center !important;
+    gap:             0px !important;
+    padding:         24px 16px !important;
+    overflow:        auto !important;
+    box-sizing:      border-box !important;
+
+    /* layered radial glows + gradient */
+    background:
+        radial-gradient(ellipse at 15% 35%, rgba(37, 99, 235, 0.07) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 70%, rgba(14, 165, 233, 0.05) 0%, transparent 55%),
+        linear-gradient(160deg, var(--gb-bg) 0%, var(--gb-bg2) 60%, var(--gb-bg) 100%)
+        !important;
+    background-color: var(--gb-bg) !important;
+}
+
+/*
+ * .login-dialog-middle is the old table-cell centering wrapper.
+ * `display: contents` makes it layout-transparent so .login-dialog
+ * becomes a direct flex child of .login-ui for centering.
+ */
+.login-ui .login-dialog-middle {
+    display:        contents !important;
+}
+
+/* ============================================================
+   Login card  (.login-dialog also has class "notification")
+   ============================================================ */
+
+.login-ui .login-dialog,
+.login-ui .login-dialog.notification {
+    display:        block !important;
+    float:          none !important;
+    position:       relative !important;   /* contain .version-number */
+    width:          420px !important;
+    max-width:      calc(100vw - 32px) !important;
+    max-height:     calc(100vh - 48px) !important;
+    overflow-y:     auto !important;
+    padding:        40px 44px !important;
+    box-sizing:     border-box !important;
+
+    background:     var(--gb-card) !important;
+    border:         1px solid var(--gb-card-border) !important;
+    border-radius:  var(--gb-r) !important;
+    box-shadow:     var(--gb-card-shadow) !important;
+
+    /* reset old font-size: 1.25em so 1rem = 1rem throughout */
+    font-size:      1rem !important;
+    font-family:    var(--gb-font) !important;
+    color:          var(--gb-text) !important;
+    text-align:     left !important;
+}
+
+/* Luminous top-edge accent */
+.login-ui .login-dialog::before {
+    content:        '' !important;
+    position:       absolute !important;
+    top:            0 !important;
+    left:           14px !important;
+    right:          14px !important;
+    height:         1px !important;
+    background:     linear-gradient(90deg,
+                      transparent 0%,
+                      var(--gb-accent-top) 50%,
+                      transparent 100%) !important;
+    pointer-events: none !important;
+}
+
+/* ============================================================
+   Logo
+   ============================================================ */
+
+.login-ui .login-dialog .logo {
+    /* Replace URL with your own image; namespace matches guac-manifest.json */
+    background-image:    url('app/ext/modern-branding/images/logo.png') !important;
+    background-size:     contain !important;
+    background-repeat:   no-repeat !important;
+    background-position: center !important;
+    width:       60px !important;
+    height:      60px !important;
+    margin:      0 auto 20px !important;
+    display:     block !important;
+    filter:      drop-shadow(0 4px 12px rgba(37, 99, 235, 0.35)) !important;
+    float:       none !important;
+}
+
+/* ============================================================
+   Version block (.version, .app-name, .version-number)
+   ============================================================ */
+
+.login-ui .login-dialog .version {
+    padding:    0 0 20px 0 !important;
+    text-align: center !important;
+}
+
+/* APP.NAME  →  styled as card title */
+.login-ui .login-dialog .version .app-name {
+    color:          var(--gb-text) !important;
+    font-size:      1.45rem !important;
+    font-weight:    700 !important;
+    letter-spacing: -0.02em !important;
+    text-transform: none !important;    /* override default UPPERCASE */
+    text-align:     center !important;
+    line-height:    1.2 !important;
+    font-family:    var(--gb-font) !important;
+}
+
+/*
+ * Version badge was:  position:absolute; right:0; bottom:0; background:green
+ * Reset to non-absolute so it no longer floats at the page corner.
+ */
+.login-ui .login-dialog .version .version-number {
+    position:       static !important;
+    display:        block !important;
+    background:     none !important;
+    border-radius:  0 !important;
+    color:          var(--gb-text3) !important;
+    font-size:      0.7rem !important;
+    font-style:     italic !important;
+    font-weight:    400 !important;
+    opacity:        0.55 !important;
+    padding:        3px 0 0 0 !important;
+    margin:         0 !important;
+    text-align:     center !important;
+}
+
+/* ============================================================
+   Form fields  (.login-fields > .labeled-field)
+   ============================================================ */
+
+.login-ui .login-dialog .login-fields {
+    margin-bottom: 4px !important;
+}
+
+/*
+ * Guacamole uses a "floating label" pattern where .field-header is
+ * position:absolute (z-index:-1) so the label visually sits inside
+ * the empty input. We replace that with a standard label-above-input
+ * layout for clarity.
+ */
+.login-ui .login-dialog .login-fields .labeled-field {
+    display:       block !important;
+    position:      static !important;
+    margin-bottom: 14px !important;
+}
+
+.login-ui .login-dialog .login-fields .labeled-field .field-header {
+    display:        block !important;
+    position:       static !important;
+    z-index:        auto !important;
+    overflow:       visible !important;
+    margin:         0 0 5px 0 !important;
+    font-size:      0.8125rem !important;
+    font-weight:    500 !important;
+    letter-spacing: 0.01em !important;
+    opacity:        1 !important;
+    color:          var(--gb-text2) !important;
+    font-family:    var(--gb-font) !important;
+}
+
+.login-ui .login-dialog .login-fields .labeled-field .field-header label {
+    color:        var(--gb-text2) !important;
+    font-size:    0.8125rem !important;
+    font-weight:  500 !important;
+    cursor:       default !important;
+    font-family:  var(--gb-font) !important;
+    margin-left:  5px !important;
+}
+
+/* ============================================================
+   Text / password inputs
+   ============================================================ */
+
+.login-ui .login-dialog .login-fields input[type="text"],
+.login-ui .login-dialog .login-fields input[type="password"],
+.login-ui .login-dialog .login-fields input[type="email"] {
+    display:        block !important;
+    width:          100% !important;
+    box-sizing:     border-box !important;
+    background:     var(--gb-input-bg) !important;
+    border:         1px solid var(--gb-input-bd) !important;
+    border-radius:  var(--gb-r-sm) !important;
+    color:          var(--gb-text) !important;
+    font-size:      0.9375rem !important;
+    font-family:    var(--gb-font) !important;
+    padding:        10px 13px !important;
+    margin-bottom:  0 !important;
+    outline:        none !important;
+    transition:     border-color 0.15s, box-shadow 0.15s !important;
+    -webkit-appearance: none !important;
+    appearance:         none !important;
+}
+
+.login-ui .login-dialog .login-fields input[type="text"]:focus,
+.login-ui .login-dialog .login-fields input[type="password"]:focus {
+    border-color: var(--gb-input-focus) !important;
+    box-shadow:   0 0 0 3px var(--gb-accent-glow) !important;
+    background:   var(--gb-input-bg) !important;
+}
+
+.login-ui .login-dialog .login-fields input:-webkit-autofill,
+.login-ui .login-dialog .login-fields input:-webkit-autofill:focus {
+    -webkit-box-shadow:      0 0 0 40px #0d1117 inset !important;
+    -webkit-text-fill-color: var(--gb-text) !important;
+    caret-color:             var(--gb-text) !important;
+}
+
+/* ============================================================
+   Submit / Login button   (input.login inside .buttons)
+   ============================================================ */
+
+.login-ui .login-dialog .buttons {
+    margin-top:  8px !important;
+    text-align:  left !important;  /* override default right-align */
+}
+
+.login-ui .login-dialog .buttons input[type="submit"].login,
+.login-ui .login-dialog .buttons input[type="submit"] {
+    display:        block !important;
+    width:          100% !important;
+    box-sizing:     border-box !important;
+    background:     var(--gb-accent) !important;
+    color:          #fff !important;
+    border:         none !important;
+    border-radius:  var(--gb-r-sm) !important;
+    font-size:      0.9375rem !important;
+    font-weight:    600 !important;
+    font-family:    var(--gb-font) !important;
+    padding:        10px 20px !important;
+    margin:         0 !important;
+    cursor:         pointer !important;
+    box-shadow:     0 2px 8px var(--gb-accent-glow) !important;
+    transition:     background 0.15s, box-shadow 0.15s, transform 0.1s !important;
+    -webkit-appearance: none !important;
+    appearance:         none !important;
+}
+
+.login-ui .login-dialog .buttons input[type="submit"].login:hover,
+.login-ui .login-dialog .buttons input[type="submit"]:hover {
+    background:  var(--gb-accent-h) !important;
+    box-shadow:  0 4px 18px var(--gb-accent-glow) !important;
+    transform:   translateY(-1px) !important;
+}
+
+.login-ui .login-dialog .buttons input[type="submit"].login:active {
+    transform: translateY(0) !important;
+}
+
+/* "continue" button — always hidden for the standard login flow.
+   Guacamole renders it unconditionally in the DOM; the default Guacamole
+   UI never shows it either. Third-party TOTP extensions that need it can
+   add their own override rule to display it. */
+.login-ui .login-dialog .buttons input[type="submit"].continue-login {
+    display: none !important;
+}
+
+/* ============================================================
+   "or" divider  (injected by modern-login.js)
+   ============================================================ */
+
+.guac-auth-divider {
+    display:     flex !important;
+    align-items: center !important;
+    gap:         10px !important;
+    margin:      20px 0 !important;
+    color:       var(--gb-text3) !important;
+    font-size:   0.72rem !important;
+    font-family: var(--gb-font) !important;
+}
+
+.guac-auth-divider::before,
+.guac-auth-divider::after {
+    content:    '' !important;
+    flex:       1 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+
+.guac-auth-divider span {
+    text-transform: uppercase !important;
+    letter-spacing: 0.07em !important;
+    white-space:    nowrap !important;
+}
+
+/* ============================================================
+   SSO / OIDC provider section
+   ============================================================
+   .sso-providers is injected by guacamole-auth-sso as a SIBLING
+   of .login-dialog-middle (i.e. a direct child of .login-ui),
+   with position:absolute; bottom:0; left:0.
+
+   Two-layer strategy:
+     A) CSS fallback  — override the absolute positioning so
+        .sso-providers flows naturally as a flex child of .login-ui
+        (which uses align-items:center), centering it horizontally
+        and stacking it below the card.
+     B) JS enhancement — modern-login.js tries to move it inside
+        .login-form so it shares the card boundary.  The rules
+        under ".login-ui .login-dialog .sso-providers" then take
+        precedence over the fallback rules.
+   ============================================================ */
+
+/* ── A) Fallback: SSO outside the card ────────────────────── */
+
+/* Override position:absolute so the element re-enters flex flow */
+.login-ui > .sso-providers {
+    position:       static !important;
+    bottom:         auto !important;
+    left:           auto !important;
+    /* Match card width so it aligns with the card above it */
+    width:          420px !important;
+    max-width:      calc(100vw - 32px) !important;
+    box-sizing:     border-box !important;
+    padding:        0 !important;
+    margin:         0 0 24px 0 !important;
+    background:     none !important;
+    font-size:      0 !important;  /* hides the 'Sign in with:' text node */
+    font-family:    var(--gb-font) !important;
+    color:          var(--gb-text2) !important;
+}
+
+/* Header label ("Sign in with:") — not needed, we use a JS divider */
+.login-ui > .sso-providers > *:not(.sso-provider-list) {
+    display: none !important;
+}
+
+.login-ui > .sso-providers .sso-provider-list {
+    list-style: none !important;
+    display:    block !important;
+    margin:     0 !important;
+    padding:    0 !important;
+    width:      100% !important;
+}
+
+.login-ui > .sso-providers .sso-provider-list li {
+    display: block !important;
+    width:   100% !important;
+    margin:  0 0 8px 0 !important;
+    padding: 0 !important;
+}
+
+.login-ui > .sso-providers .sso-provider-list li::before {
+    display: none !important;
+    content: '' !important;
+}
+
+.login-ui > .sso-providers .sso-provider-list li a,
+.login-ui > .sso-providers .sso-provider-list li button {
+    display:         block !important;
+    width:           100% !important;
+    box-sizing:      border-box !important;
+    background:      transparent !important;
+    color:           var(--gb-text2) !important;
+    border:          1px solid var(--gb-sso-bd) !important;
+    border-radius:   var(--gb-r-sm) !important;
+    font-size:       0.9375rem !important;
+    font-weight:     500 !important;
+    font-family:     var(--gb-font) !important;
+    padding:         10px 20px !important;
+    text-align:      center !important;
+    text-decoration: none !important;
+    cursor:          pointer !important;
+    line-height:     1.5 !important;
+    margin:          0 !important;
+    transition:      background 0.15s, border-color 0.15s, color 0.15s !important;
+}
+
+.login-ui > .sso-providers .sso-provider-list li a:hover,
+.login-ui > .sso-providers .sso-provider-list li button:hover {
+    background:   var(--gb-sso-h-bg) !important;
+    border-color: var(--gb-sso-h-bd) !important;
+    color:        var(--gb-text) !important;
+}
+
+/* ── B) Enhanced: SSO moved inside the card by JS ─────────── */
+
+.login-ui .login-dialog .sso-providers {
+    display:        block !important;
+    position:       static !important;
+    bottom:         auto !important;
+    left:           auto !important;
+    padding:        0 !important;
+    margin:         0 0 24px 0 !important;
+    background:     none !important;
+    font-size:      0 !important;  /* hides the 'Sign in with:' text node */
+    font-family:    var(--gb-font) !important;
+    color:          var(--gb-text2) !important;
+}
+
+.login-ui .login-dialog .sso-providers > *:not(.sso-provider-list) {
+    display:     none !important;
+}
+
+.login-ui .login-dialog .sso-providers .sso-provider-list {
+    list-style: none !important;
+    display:    block !important;
+    margin:     0 !important;
+    padding:    0 !important;
+    width:      100% !important;
+}
+
+.login-ui .login-dialog .sso-providers .sso-provider-list li {
+    display:    block !important;
+    width:      100% !important;
+    margin:     0 0 8px 0 !important;
+    padding:    0 !important;
+}
+
+.login-ui .login-dialog .sso-providers .sso-provider-list li::before {
+    display: none !important;
+    content: '' !important;
+}
+
+.login-ui .login-dialog .sso-providers .sso-provider-list li a,
+.login-ui .login-dialog .sso-providers .sso-provider-list li button {
+    display:         block !important;
+    width:           100% !important;
+    box-sizing:      border-box !important;
+    background:      transparent !important;
+    color:           var(--gb-text2) !important;
+    border:          1px solid var(--gb-sso-bd) !important;
+    border-radius:   var(--gb-r-sm) !important;
+    font-size:       0.9375rem !important;
+    font-weight:     500 !important;
+    font-family:     var(--gb-font) !important;
+    padding:         10px 20px !important;
+    text-align:      center !important;
+    text-decoration: none !important;
+    cursor:          pointer !important;
+    line-height:     1.5 !important;
+    margin:          0 !important;
+    transition:      background 0.15s, border-color 0.15s, color 0.15s !important;
+}
+
+.login-ui .login-dialog .sso-providers .sso-provider-list li a:hover,
+.login-ui .login-dialog .sso-providers .sso-provider-list li button:hover {
+    background:   var(--gb-sso-h-bg) !important;
+    border-color: var(--gb-sso-h-bd) !important;
+    color:        var(--gb-text) !important;
+}
+
+/* ============================================================
+   Error / notification banner
+   ============================================================ */
+
+.login-ui .login-error,
+.login-ui p.login-error {
+    /* Override Guacamole's fixed-position error bar */
+    display:        none !important;
+}
+
+/* Show it when the .error class is on .login-ui */
+.login-ui.error .login-error,
+.login-ui.error p.login-error {
+    display:        block !important;
+    position:       fixed !important;
+    inset:          0 0 auto 0 !important;
+    background:     rgba(185, 28, 28, 0.12) !important;
+    border-bottom:  1px solid rgba(239, 68, 68, 0.30) !important;
+    color:          #fca5a5 !important;
+    font-size:      0.875rem !important;
+    font-family:    var(--gb-font) !important;
+    padding:        10px 16px !important;
+    margin:         0 !important;
+    text-align:     center !important;
+    border-radius:  0 !important;
+    z-index:        100 !important;
+}
+
+/* ============================================================
+   Responsive — compact on small viewports
+   ============================================================ */
+
+@media (max-width: 500px) {
+    .login-ui .login-dialog,
+    .login-ui .login-dialog.notification {
+        padding:       32px 24px !important;
+        border-radius: var(--gb-r-sm) !important;
+    }
+
+    .login-ui .login-dialog .version .app-name {
+        font-size: 1.25rem !important;
+    }
+}
+
+/* ============================================================
+   Optional subtitle  (injected by modern-login.js when
+   cfg.appSubtitle is set)
+   ============================================================ */
+
+.login-ui .login-dialog .guac-brand-subtitle {
+    display:     block !important;
+    color:       var(--gb-text2) !important;
+    font-size:   0.875rem !important;
+    font-weight: 400 !important;
+    text-align:  center !important;
+    margin:      4px 0 0 0 !important;
+    font-family: var(--gb-font) !important;
+    opacity:     0.8 !important;
+}
