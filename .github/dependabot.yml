@@ -4,3 +4,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+  # Tomcat base image in Dockerfile.base
+  - package-ecosystem: 'docker'
+    directory: '/'
+    schedule:
+      interval: 'weekly'

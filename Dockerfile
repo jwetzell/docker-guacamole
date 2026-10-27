@@ -1,4 +1,5 @@
-FROM jwetzell/guacamole:base
+ARG BASE_IMAGE=ghcr.io/justinkocian/guac-forge-base:latest
+FROM ${BASE_IMAGE}
 
 WORKDIR ${GUACAMOLE_HOME}
 

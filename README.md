@@ -16,10 +16,10 @@ Guac-Forge is an independent project. It is not affiliated with, endorsed by, or
 docker run \
   -p 8080:8080 \
   -v </path/to/config>:/config \
-  <registry>/<your-user>/guac-forge:<tag>
+  ghcr.io/justinkocian/guac-forge:latest
 ```
 
-Until the first Guac-Forge release is published, [build from source](#build-from-source).
+`latest` tracks the `master` branch. Releases are also tagged by version (for example `1.2.0` and `1.2`), and every build is tagged with its commit (`sha-<commit>`). You can also [build from source](#build-from-source).
 
 The image is multi-platform and runs on amd64 and ARM hosts, including Raspberry Pi boards, using the same command on every platform. It also runs on Docker Desktop for Mac and Windows and on Synology DSM.
 
@@ -41,7 +41,7 @@ docker run \
   -p 8080:8080 \
   -v </path/to/config>:/config \
   -e "EXTENSIONS=auth-ldap,auth-duo" \
-  <registry>/<your-user>/guac-forge:<tag>
+  ghcr.io/justinkocian/guac-forge:latest
 ```
 
 Available extensions:
@@ -73,7 +73,7 @@ docker run \
   -v </path/to/config>:/config \
   -e "EXTENSIONS=branding" \
   -e "BRANDING_TITLE=Acme Remote Access" \
-  <registry>/<your-user>/guac-forge:<tag>
+  ghcr.io/justinkocian/guac-forge:latest
 ```
 
 The extension is rebuilt every time the container starts, so a restart applies any change. There is no manual zipping or jar building.
@@ -115,7 +115,7 @@ Set `TRUSTED_PROXIES` to your proxy's IP, and Guacamole uses the client IP from 
 ```yaml
 services:
   guacamole:
-    image: <registry>/<your-user>/guac-forge:<tag>
+    image: ghcr.io/justinkocian/guac-forge:latest
     environment:
       - TRUSTED_PROXIES=172.30.0.10
     volumes:
@@ -156,7 +156,7 @@ The default username is `guacadmin` with the password `guacadmin`. **Change this
 ```yaml
 services:
   guacamole:
-    image: <registry>/<your-user>/guac-forge:<tag>
+    image: ghcr.io/justinkocian/guac-forge:latest
     container_name: guacamole
     volumes:
       - postgres:/config
@@ -174,7 +174,7 @@ Bind-mounted volumes behave differently under Docker for Windows, and you may hi
 ## Build from source
 
 ```shell
-git clone https://github.com/<your-user>/guac-forge.git
+git clone https://github.com/justinKocian/guac-forge.git
 cd guac-forge
 docker build --pull -t guac-forge:dev .
 docker run -p 8080:8080 -v "$(pwd)/config:/config" guac-forge:dev
